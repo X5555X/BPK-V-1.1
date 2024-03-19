@@ -81,12 +81,7 @@ class Dialog(QDialog):
         self.load_bd_listwidget_cont()
 
     def on_activ_combobox(self, index):
-
-
         self.ui.comboBox_2.setCurrentIndex(index)
-
-
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
