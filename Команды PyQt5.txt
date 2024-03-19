@@ -1,0 +1,12 @@
+
+
+cd C:\Users\X\Desktop\Web\Python\Work\PyQt5  // ��������� � ����� � ������
+
+
+pyuic5 -x 1.ui -o 2.py                      // ���������������� ���� � Py
+pyuic5 -x osnova.ui -o osnova.py
+
+pyuic5 -x cont.ui -o cont.py 
+
+
+.
