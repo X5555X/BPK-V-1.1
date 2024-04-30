@@ -15,10 +15,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCalendarWidget, QCheckBox, QComboBox,
-    QDateEdit, QFrame, QLabel, QListWidget,
-    QListWidgetItem, QMainWindow, QPushButton, QRadioButton,
-    QSizePolicy, QStatusBar, QTabWidget, QWidget)
+from PySide6.QtWidgets import (QApplication, QCalendarWidget, QComboBox, QDateEdit,
+    QFrame, QLabel, QListWidget, QListWidgetItem,
+    QMainWindow, QPushButton, QRadioButton, QSizePolicy,
+    QStatusBar, QTabWidget, QToolButton, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -29,7 +29,7 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName(u"centralwidget")
         self.tabWidget = QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName(u"tabWidget")
-        self.tabWidget.setGeometry(QRect(-10, 0, 681, 681))
+        self.tabWidget.setGeometry(QRect(0, 0, 681, 681))
         self.tab = QWidget()
         self.tab.setObjectName(u"tab")
         self.calendarWidget = QCalendarWidget(self.tab)
@@ -86,7 +86,7 @@ class Ui_MainWindow(object):
         self.btnEditCont.setGeometry(QRect(20, 150, 181, 61))
         self.btnDeletOsnova = QPushButton(self.tab)
         self.btnDeletOsnova.setObjectName(u"btnDeletOsnova")
-        self.btnDeletOsnova.setGeometry(QRect(300, 200, 91, 41))
+        self.btnDeletOsnova.setGeometry(QRect(580, 0, 91, 41))
         font = QFont()
         font.setBold(False)
         font.setItalic(False)
@@ -102,12 +102,18 @@ class Ui_MainWindow(object):
         self.btnClose = QPushButton(self.tab)
         self.btnClose.setObjectName(u"btnClose")
         self.btnClose.setGeometry(QRect(520, 590, 151, 61))
-        self.checkBox = QCheckBox(self.tab)
-        self.checkBox.setObjectName(u"checkBox")
-        self.checkBox.setGeometry(QRect(270, 110, 101, 41))
+        self.toolButton = QToolButton(self.tab)
+        self.toolButton.setObjectName(u"toolButton")
+        self.toolButton.setGeometry(QRect(10, 0, 71, 22))
         self.radioButton = QRadioButton(self.tab)
         self.radioButton.setObjectName(u"radioButton")
-        self.radioButton.setGeometry(QRect(270, 150, 100, 20))
+        self.radioButton.setGeometry(QRect(250, 130, 100, 20))
+        self.radioButton_2 = QRadioButton(self.tab)
+        self.radioButton_2.setObjectName(u"radioButton_2")
+        self.radioButton_2.setGeometry(QRect(250, 160, 111, 20))
+        self.radioButton_3 = QRadioButton(self.tab)
+        self.radioButton_3.setObjectName(u"radioButton_3")
+        self.radioButton_3.setGeometry(QRect(250, 190, 131, 20))
         self.tabWidget.addTab(self.tab, "")
         self.btnDeletOsnova.raise_()
         self.calendarWidget.raise_()
@@ -121,8 +127,10 @@ class Ui_MainWindow(object):
         self.btnEditCont.raise_()
         self.listWidget_o.raise_()
         self.btnClose.raise_()
-        self.checkBox.raise_()
+        self.toolButton.raise_()
         self.radioButton.raise_()
+        self.radioButton_2.raise_()
+        self.radioButton_3.raise_()
         self.tab_2 = QWidget()
         self.tab_2.setObjectName(u"tab_2")
         self.tabWidget.addTab(self.tab_2, "")
@@ -155,8 +163,10 @@ class Ui_MainWindow(object):
         self.btnEditCont.setText(QCoreApplication.translate("MainWindow", u"\u0418\u0437\u043c\u0435\u043d\u0438\u0442\u044c \u043a\u043e\u043d\u0442\u0440\u0430\u0433\u0435\u043d\u0442\u0430", None))
         self.btnDeletOsnova.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0434\u0430\u043b\u0438\u0442\u044c", None))
         self.btnClose.setText(QCoreApplication.translate("MainWindow", u"\u0417\u0430\u043a\u0440\u044b\u0442\u044c", None))
-        self.checkBox.setText(QCoreApplication.translate("MainWindow", u"CheckBox", None))
-        self.radioButton.setText(QCoreApplication.translate("MainWindow", u"RadioButton", None))
+        self.toolButton.setText(QCoreApplication.translate("MainWindow", u"\u0424\u0430\u0439\u043b", None))
+        self.radioButton.setText(QCoreApplication.translate("MainWindow", u"\u0411\u041f\u041a", None))
+        self.radioButton_2.setText(QCoreApplication.translate("MainWindow", u"\u0421\u0442\u0440\u043e\u0439 \u0420\u0435\u0441\u0443\u0440\u0441", None))
+        self.radioButton_3.setText(QCoreApplication.translate("MainWindow", u"\u041a\u0430\u0440\u044c\u0435\u0440 \u041a\u0440\u0430\u0441\u043d\u043e\u043b\u0435\u0441\u044c\u0435", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"\u0411\u041f\u041a \u0414\u043e\u0433\u043e\u0432\u043e\u0440\u0430", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("MainWindow", u"\u0418\u041f  \u0414\u043e\u0433\u043e\u0432\u043e\u0440\u0430", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), QCoreApplication.translate("MainWindow", u"\u0411\u041f\u041a \u0414\u043e\u043f\u043d\u0438\u043a\u0438", None))

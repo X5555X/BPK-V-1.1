@@ -2,7 +2,7 @@ import os
 import sys
 from datetime import date, datetime
 import locale
-from PySide6.QtWidgets import QApplication, QMainWindow, QListWidgetItem, QDialog, QMessageBox
+from PySide6.QtWidgets import QApplication, QRadioButton, QMainWindow, QListWidgetItem, QDialog, QMessageBox
 from PySide6 import QtCore
 from osnova import Ui_MainWindow
 from cont import Ui_Dialog
@@ -10,22 +10,29 @@ from sqlalchemy import  create_engine, text
 from sqlalchemy.orm import Session
 from docxtpl import DocxTemplate
 
+
+def format_date_with_declension(date):
+    months = [
+        "Января", "Февраля", "Марта", "Апреля", "Мая", "Июня",
+        "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"
+    ]
+    day = date.day()
+    month = months[date.month() - 1]  # Индексация месяцев начинается с 0
+    year = date.year()
+    return f"{day} {month} {year} г."
+
 class Dialog(QDialog):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
-
         self.engines = create_engine("sqlite+pysqlite:///db/bpk.db", echo=True)
         self.ui.btnAdd.clicked.connect(self.accept)
         self.ui.btnCancel.clicked.connect(self.reject)
-
         self.load_bd_listwidget_cont()
         self.ui.btnDeletCont.clicked.connect(self.delet_btn_cont)
-
         self.ui.comboBox.currentIndexChanged.connect(self.on_activ_combobox)
-
 
     def get_data(self):
         return {
@@ -88,28 +95,21 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-
         self.engine = create_engine("sqlite+pysqlite:///db/bpk.db", echo=True)
-
         self.caledar_today()
         self.ui.dateEdit.dateChanged.connect(self.on_dateedit_change)
         self.ui.calendarWidget.clicked.connect(self.on_click_caledar)
-
         self.ui.btnClose.clicked.connect(lambda:self.close())
-
-
         self.load_bd_comboBox()
         self.load_bd_listwidget_osnova()
         self.ui.comboBox.currentIndexChanged.connect(self.load_bd_listwidget_osnova)
-        
         self.ui.btnAddCont.clicked.connect(self.add_btn_cont)
         self.ui.btnSave.clicked.connect(self.save_btn_ocnova)
-
         self.ui.btnEditCont.clicked.connect(self.edit_btn_cont)
-
         self.ui.btnDeletOsnova.clicked.connect(self.delet_btn_osnova)
 
     # Открытие 2-ой формы через кнопку    
+
     def add_btn_cont(self):
         dialog = Dialog()
         r = dialog.exec()
@@ -148,55 +148,135 @@ class MainWindow(QMainWindow):
         self.load_bd_listwidget_osnova()
 
     def save_btn_ocnova(self):
+
+        if self.ui.radioButton.isChecked():
         
-        item = self.ui.listWidget_o.currentItem() 
-        data = item.data(QtCore.Qt.ItemDataRole.UserRole)
+            item = self.ui.listWidget_o.currentItem() 
+            data = item.data(QtCore.Qt.ItemDataRole.UserRole)
 
-        with Session(self.engine) as s:
-            query = '''
-            SELECT * 
-            FROM org 
-            WHERE id = :id
-            '''
+            with Session(self.engine) as s:
+                query = '''
+                SELECT * 
+                FROM org 
+                WHERE id = :id
+                '''
 
-            s.execute(text(query), {'id': data.id})
+                s.execute(text(query), {'id': data.id})
 
+            doc = DocxTemplate("db/шаблон БПК.docx")
 
+            selected_date = self.ui.calendarWidget.selectedDate()
+            formatted_date = format_date_with_declension(selected_date)
 
-        doc = DocxTemplate("db/шаблон.docx")
-        locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
-        nomer_dog = self.ui.dateEdit.dateTime().toString("dd/MM-yyyy")
-        data_dog1 = self.ui.dateEdit.dateTime().toString("«dd» MMMM yyyy г.")
-        data_dog2 = self.ui.dateEdit.dateTime().toString("dd.MM.yyyy")
+            nomer_dog = self.ui.dateEdit.dateTime().toString("dd/MM-yyyy")
+            data_dog1 = self.ui.dateEdit.dateTime().toString(formatted_date)
+            data_dog2 = self.ui.dateEdit.dateTime().toString("dd.MM.yyyy")
 
-        # 'ogrn':data.ogrn,
-        context = {'nomer_dog':nomer_dog, 'data_dog1':data_dog1, 'data_dog2':data_dog2, 
-                    'name_o_full':data.name_org_full, 'fio_full':data.fio_full,
-                    'emal':data.emal, 'tel':data.tel, 'fio':data.fio, 'inn':data.inn,
-                    'name_o':data.name_org, 'dolzhnost':data.dolzhnost, 'bik':data.bik,
-                    'kpp':data.kpp, 'kor_chet':data.kor_chet, 'bank':data.bank,
-                    'adres':data.adres, 'ras_chet':data.ras_chet, 'ogrn':data.ogrn,
-                    'dolzhnost_r':data.dolzhnost_r}
-        doc.render(context, autoescape=True)
-        doc.save(str(f"db/Договор поставки № ИН_{data_dog2} - {data.name_org}.docx"))
+            context = {'nomer_dog':nomer_dog, 'data_dog1':data_dog1, 'data_dog2':data_dog2, 
+                        'name_o_full':data.name_org_full, 'fio_full':data.fio_full,
+                        'emal':data.emal, 'tel':data.tel, 'fio':data.fio, 'inn':data.inn,
+                        'name_o':data.name_org, 'dolzhnost':data.dolzhnost, 'bik':data.bik,
+                        'kpp':data.kpp, 'kor_chet':data.kor_chet, 'bank':data.bank,
+                        'adres':data.adres, 'ras_chet':data.ras_chet, 'ogrn':data.ogrn,
+                        'dolzhnost_r':data.dolzhnost_r}
+            doc.render(context, autoescape=True)
+            doc.save(str(f"db/Договор поставки № ИН_{data_dog2} ООО «БПК» - {data.name_org}.docx"))
+        
+        elif self.ui.radioButton_2.isChecked():
 
+            item = self.ui.listWidget_o.currentItem() 
+            data = item.data(QtCore.Qt.ItemDataRole.UserRole)
 
+            with Session(self.engine) as s:
+                query = '''
+                SELECT * 
+                FROM org 
+                WHERE id = :id
+                '''
 
+                s.execute(text(query), {'id': data.id})
 
+            doc = DocxTemplate("db/шаблон Строй Ресурс.docx")
+
+            selected_date = self.ui.calendarWidget.selectedDate()
+            formatted_date = format_date_with_declension(selected_date)
+            
+            nomer_dog = self.ui.dateEdit.dateTime().toString("yy/MM/dd")
+            data_dog1 = self.ui.dateEdit.dateTime().toString(formatted_date)
+            data_dog2 = self.ui.dateEdit.dateTime().toString("dd.MM.yyyy")
+
+            context = {'nomer_dog':nomer_dog, 'data_dog1':data_dog1, 'data_dog2':data_dog2, 
+                        'name_o_full':data.name_org_full, 'fio_full':data.fio_full,
+                        'emal':data.emal, 'tel':data.tel, 'fio':data.fio, 'inn':data.inn,
+                        'name_o':data.name_org, 'dolzhnost':data.dolzhnost, 'bik':data.bik,
+                        'kpp':data.kpp, 'kor_chet':data.kor_chet, 'bank':data.bank,
+                        'adres':data.adres, 'ras_chet':data.ras_chet, 'ogrn':data.ogrn,
+                        'dolzhnost_r':data.dolzhnost_r}
+            doc.render(context, autoescape=True)
+            doc.save(str(f"db/Договор поставки № ИН_{data_dog2} ООО «Строй Ресурс» - {data.name_org}.docx"))
+
+        elif self.ui.radioButton_3.isChecked():
+
+            item = self.ui.listWidget_o.currentItem() 
+            data = item.data(QtCore.Qt.ItemDataRole.UserRole)
+
+            with Session(self.engine) as s:
+                query = '''
+                SELECT * 
+                FROM org 
+                WHERE id = :id
+                '''
+
+                s.execute(text(query), {'id': data.id})
+
+            doc = DocxTemplate("db/шаблон КК.docx")
+
+            selected_date = self.ui.calendarWidget.selectedDate()
+            formatted_date = format_date_with_declension(selected_date)
+            
+            nomer_dog = self.ui.dateEdit.dateTime().toString("dd/MM-yyyy")
+            data_dog1 = self.ui.dateEdit.dateTime().toString(formatted_date)
+            data_dog2 = self.ui.dateEdit.dateTime().toString("dd.MM.yyyy")
+
+            context = {'nomer_dog':nomer_dog, 'data_dog1':data_dog1, 'data_dog2':data_dog2, 
+                        'name_o_full':data.name_org_full, 'fio_full':data.fio_full,
+                        'emal':data.emal, 'tel':data.tel, 'fio':data.fio, 'inn':data.inn,
+                        'name_o':data.name_org, 'dolzhnost':data.dolzhnost, 'bik':data.bik,
+                        'kpp':data.kpp, 'kor_chet':data.kor_chet, 'bank':data.bank,
+                        'adres':data.adres, 'ras_chet':data.ras_chet, 'ogrn':data.ogrn,
+                        'dolzhnost_r':data.dolzhnost_r}
+            doc.render(context, autoescape=True)
+            doc.save(str(f"db/Договор поставки № ИН_{data_dog2} ООО «Карьер Краснолесье» - {data.name_org}.docx"))
 
     def edit_btn_cont(self):
+
+        item = self.ui.listWidget_o.currentItem() 
+        data1 = item.data(QtCore.Qt.ItemDataRole.UserRole)
+
         dialog = Dialog()
         r = dialog.exec()
+        
+        
+        with Session(self.engine) as s:
+            query = """
+            SELECT * FROM org 
+
+            """
+            s.execute(text(query), { 
+
+
+            })
+            s.commit()
+
+
+
 
     # Удаление данных с основной формы в tablewidget
-        
- 
- 
+
     def delet_btn_osnova(self):  
 
         item = self.ui.listWidget_o.currentItem() 
         data = item.data(QtCore.Qt.ItemDataRole.UserRole)
-
 
         with Session(self.engine) as s:
             query = '''
@@ -223,8 +303,6 @@ class MainWindow(QMainWindow):
         self.ui.label.setText("%s" % data)
 
         self.ui.calendarWidget.setSelectedDate(self.ui.dateEdit.date())
-
-        
 
     def on_click_caledar(self):
 
@@ -279,13 +357,9 @@ class MainWindow(QMainWindow):
             self.ui.comboBox.addItem(r.name_org, r)
         self.load_bd_listwidget_osnova()
 
-        
-
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
-
-
     window = MainWindow()
     window.show()
 
