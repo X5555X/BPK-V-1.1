@@ -250,26 +250,10 @@ class MainWindow(QMainWindow):
 
     def edit_btn_cont(self):
 
-        item = self.ui.listWidget_o.currentItem() 
-        data1 = item.data(QtCore.Qt.ItemDataRole.UserRole)
-
         dialog = Dialog()
         r = dialog.exec()
         
         
-        with Session(self.engine) as s:
-            query = """
-            SELECT * FROM org 
-
-            """
-            s.execute(text(query), { 
-
-
-            })
-            s.commit()
-
-
-
 
     # Удаление данных с основной формы в tablewidget
 
