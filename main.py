@@ -10,7 +10,6 @@ from sqlalchemy import  create_engine, text
 from sqlalchemy.orm import Session
 from docxtpl import DocxTemplate
 
-
 def format_date_with_declension(date):
     months = [
         "Января", "Февраля", "Марта", "Апреля", "Мая", "Июня",
